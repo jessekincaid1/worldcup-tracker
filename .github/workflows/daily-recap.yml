@@ -1,0 +1,29 @@
+name: World Cup Daily Recap
+
+on:
+  schedule:
+    - cron: '0 13 * * *'  # Runs at 7:00 AM Mountain Time (MDT = UTC-6) every day
+  workflow_dispatch:        # Also lets you trigger it manually for testing
+
+jobs:
+  send-recap:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install anthropic requests
+
+      - name: Run World Cup recap
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          TO_EMAIL: ${{ secrets.TO_EMAIL }}
+        run: python recap.py
